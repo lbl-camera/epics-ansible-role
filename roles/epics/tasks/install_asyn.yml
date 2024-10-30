@@ -1,0 +1,36 @@
+- name: Ensure asyn module directory exists
+  ansible.builtin.file:
+    path: "{{ epics_base_dir }}/../modules/asyn"
+    state: directory
+    mode: '0755'
+
+- name: Check if asyn repository is already cloned
+  ansible.builtin.stat:
+    path: "{{ epics_base_dir }}/../modules/asyn/.git"
+  register: asyn_repo_exists
+
+- name: Clone asyn repository {{ asyn_version }}
+  ansible.builtin.git:
+    repo: "https://github.com/epics-modules/asyn.git"
+    dest: "{{ epics_base_dir }}/../modules/asyn"
+    version: "{{ asyn_version }}"
+  when: not asyn_repo_exists.stat.exists
+
+- name: Ensure configure directory exists in asyn
+  ansible.builtin.file:
+    path: "{{ epics_base_dir }}/../modules/asyn/configure"
+    state: directory
+    mode: '0755'
+
+- name: Set EPICS_BASE in asyn configure/RELEASE file
+  ansible.builtin.lineinfile:
+    path: "{{ epics_base_dir }}/../modules/asyn/configure/RELEASE"
+    line: |
+      EPICS_BASE={{ epics_base_dir }}
+    create: yes
+
+- name: Compile asyn module {{ asyn_version }}
+  ansible.builtin.shell: |
+    make
+  args:
+    chdir: "{{ epics_base_dir }}/../modules/asyn"

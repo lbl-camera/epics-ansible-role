@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: true
+  roles:
+    - role: epics
+      vars:
+        epics_base_dir: "/opt/epics/base"
+        install_mrf: true
+        install_devlib: true

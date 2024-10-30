@@ -1,0 +1,108 @@
+---
+- name: Ensure EPICS base directory exists
+  ansible.builtin.file:
+    path: "{{ epics_base_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Check if EPICS Base repository is already cloned
+  ansible.builtin.stat:
+    path: "{{ epics_base_dir }}/.git"
+  register: epics_repo_exists
+
+- name: Install required packages on Debian-based systems
+  ansible.builtin.package:
+    name:
+      - build-essential
+      - git
+      - libreadline-dev
+      - libncurses5-dev
+      - libdbd-dev
+      - libc-dev-bin # asyn
+      - libntirpc-dev  # async rpc.h
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install required packages on Red Hat-based systems
+  ansible.builtin.package:
+    name:
+      - gcc
+      - gcc-c++
+      - git
+      - readline-devel
+      - ncurses-devel
+      - libdb-devel
+      - rpcgen # for asyn
+#      - libtirpc-devel # for asyn rpc.h
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Clone EPICS Base repository varsion {{ epics_version }}
+  ansible.builtin.git:
+    repo: "https://github.com/epics-base/epics-base.git"
+    dest: "{{ epics_base_dir }}"
+    version: "{{ epics_version }}"
+  when: not epics_repo_exists.stat.exists
+
+- name: Check if EPICS Base bin directory exists
+  ansible.builtin.stat:
+    path: "{{ epics_base_dir }}/bin"
+  register: epics_bin_exists
+
+- name: Compile EPICS Base
+  ansible.builtin.shell: |
+    make
+  args:
+    chdir: "{{ epics_base_dir }}"
+  when: not epics_bin_exists.stat.exists
+
+- name: Detect EPICS_HOST_ARCH
+  ansible.builtin.command: "{{ epics_base_dir }}/startup/EpicsHostArch"
+  register: epics_host_arch_result
+  environment:
+    EPICS_BASE: "{{ epics_base_dir }}"
+  changed_when: false
+
+- name: Set EPICS_HOST_ARCH variable
+  ansible.builtin.set_fact:
+    epics_host_arch: "{{ epics_host_arch_result.stdout }}"
+
+- name: Ensure EPICS_HOST_ARCH is available
+  ansible.builtin.debug:
+    msg: "Detected EPICS_HOST_ARCH: {{ epics_host_arch }}"
+
+- name: Copy environment variables template
+  ansible.builtin.template:
+    src: epics_env.j2
+    dest: /etc/profile.d/epics.sh
+    mode: '0644'
+
+- name: Source EPICS environment
+  ansible.builtin.shell: source /etc/profile.d/epics.sh
+
+# Add modules below
+
+- name: Install devLib2 module
+  ansible.builtin.include_tasks: install_devlib2.yml
+  when: install_devlib or install_mrf
+
+
+- name: Install mrf module
+  ansible.builtin.include_tasks: install_mrf.yml
+  when: install_devlib or install_mrf
+
+- name: Install asyn module
+  ansible.builtin.include_tasks: install_asyn.yml
+  when: install_asyn
+
+- name: Install modbus module
+  ansible.builtin.include_tasks: install_modbus.yml
+  when: install_modbus
+
+- name: Install streamdevice module
+  ansible.builtin.include_tasks: install_streamdevice.yml
+  when: install_streamdevice
+
+- name: Install motor module
+  ansible.builtin.include_tasks: install_motor.yml
+  when: install_motor

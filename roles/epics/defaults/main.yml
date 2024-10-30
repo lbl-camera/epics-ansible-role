@@ -1,0 +1,23 @@
+## Andrea Michelotti
+## andrea.michelotti@infn.it
+
+epics_base_dir: "/opt/epics/base"
+epics_version: "R7.0.8"
+devlib2_version: "2.12"
+asyn_version: "R4-44"
+autosave_version: "R5-11"
+busy_version: "R1-7-3"
+streamdevice_version: "2.8.24"
+sscan_version: "R2-11-6"
+calc_version: "R3-7-5"
+motor_version: "R7-3"
+mrfioc_version: master # update driver
+
+# EPICS module installation toggles
+install_mrf: false
+install_devlib: false
+
+install_asyn: false
+install_modbus: false
+install_streamdevice: false
+install_motor: false

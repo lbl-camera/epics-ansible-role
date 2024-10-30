@@ -1,0 +1,3 @@
+[epics_servers]
+plsparcmrf002 ansible_user=root
+plsparcmrf003 ansible_user=root
