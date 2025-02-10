@@ -1,0 +1,38 @@
+- name: Ensure calc module directory exists
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/calc"
+    state: directory
+    mode: '0755'
+
+- name: Check if calc repository is already cloned
+  ansible.builtin.stat:
+    path: "{{ epics_dir }}/modules/calc/.git"
+  register: calc_repo_exists
+
+- name: Clone calc repository {{ calc_version }}
+  ansible.builtin.git:
+    repo: "https://github.com/epics-modules/calc.git"
+    dest: "{{ epics_dir }}/modules/calc"
+    version: "{{ calc_version }}"
+  when: not calc_repo_exists.stat.exists
+
+- name: Ensure configure directory exists in calc
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/calc/configure"
+    state: directory
+    mode: '0755'
+
+- name: Set EPICS_BASE in calc configure/RELEASE file
+  ansible.builtin.lineinfile:
+    path: "{{ epics_dir }}/modules/calc/configure/RELEASE"
+    line: |
+      EPICS_BASE={{ epics_dir }}/base
+      SUPPORT={{ epics_dir }}/modules
+      SSCAN=$(SUPPORT)/sscan
+    create: yes
+
+- name: Compile calc module {{ calc_version }}
+  ansible.builtin.shell: |
+    make
+  args:
+    chdir: "{{ epics_dir }}/modules/calc"

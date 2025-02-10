@@ -1,0 +1,22 @@
+- name: epics
+  hosts: all
+  roles:
+    - role: epics
+      vars:
+      epics_dir: "/epics"
+      epics_version: "R7.0.8.1"
+      install_asyn: yes
+      install_modbus: no
+      install_streamdevice: no
+      install_motor: no
+      install_autosave: yes
+      install_calc: yes
+      install_busy: yes
+      install_sscan: yes
+      install_iocstats: yes
+      install_seq: yes
+      build_iocs: yes
+      install_areadetector: yes
+      install_ad_andor: yes
+      ad_andor_version: master
+      areadetector_version: "R3-14"

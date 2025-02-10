@@ -1,0 +1,37 @@
+- name: Ensure autosave module directory exists
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/autosave"
+    state: directory
+    mode: '0755'
+
+- name: Check if autosave repository is already cloned
+  ansible.builtin.stat:
+    path: "{{ epics_dir }}/modules/autosave/.git"
+  register: autosave_repo_exists
+
+- name: Clone autosave repository {{ autosave_version }}
+  ansible.builtin.git:
+    repo: "https://github.com/epics-modules/autosave.git"
+    dest: "{{ epics_dir }}/modules/autosave"
+    version: "{{ autosave_version }}"
+  when: not autosave_repo_exists.stat.exists
+
+- name: Ensure configure directory exists in autosave
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/autosave/configure"
+    state: directory
+    mode: '0755'
+
+- name: Set EPICS_BASE in autosave configure/RELEASE file
+  ansible.builtin.lineinfile:
+    path: "{{ epics_dir }}/modules/autosave/configure/RELEASE"
+    line: |
+      EPICS_BASE={{ epics_dir }}/base
+      SUPPORT={{ epics_dir }}/modules
+    create: yes
+
+- name: Compile autosave module {{ autosave_version }}
+  ansible.builtin.shell: |
+    make
+  args:
+    chdir: "{{ epics_dir }}/modules/autosave"

@@ -1,0 +1,36 @@
+- name: Ensure seq module directory exists
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/seq"
+    state: directory
+    mode: '0755'
+
+- name: Check if seq repository is already cloned
+  ansible.builtin.stat:
+    path: "{{ epics_dir }}/modules/seq/.git"
+  register: seq_repo_exists
+
+- name: Clone seq repository {{ seq_version }}
+  ansible.builtin.git:
+    repo: "https://github.com/epics-modules/sequencer.git"
+    dest: "{{ epics_dir }}/modules/seq"
+    version: "{{ seq_version }}"
+  when: not seq_repo_exists.stat.exists
+
+- name: Ensure configure directory exists in seq
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/seq/configure"
+    state: directory
+    mode: '0755'
+
+- name: Set EPICS_BASE in seq configure/RELEASE file
+  ansible.builtin.lineinfile:
+    path: "{{ epics_dir }}/modules/seq/configure/RELEASE"
+    line: |
+      EPICS_BASE={{ epics_dir }}/base
+    create: yes
+
+- name: Compile seq module {{ seq_version }}
+  ansible.builtin.shell: |
+    make
+  args:
+    chdir: "{{ epics_dir }}/modules/seq"

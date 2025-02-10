@@ -1,0 +1,29 @@
+- name: Ensure andor module directory exists
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/areadetector/ADAndor"
+    state: directory
+    mode: '0755'
+
+- name: Check if andor repository is already cloned
+  ansible.builtin.stat:
+    path: "{{ epics_dir }}/modules/areadetector/ADAndor/.git"
+  register: ad_andor_repo_exists
+
+- name: Clone andor repository {{ ad_andor_version }}
+  ansible.builtin.git:
+    repo: "https://github.com/areaDetector/ADAndor"
+    dest: "{{ epics_dir }}/modules/areadetector/ADAndor"
+    version: "{{ ad_andor_version }}"
+  when: not ad_andor_repo_exists.stat.exists
+
+- name: Ensure configure directory exists in andor
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/areadetector/configure"
+    state: directory
+    mode: '0755'
+
+- name: Compile andor module {{ ad_andor_version }}
+  ansible.builtin.shell: |
+    make
+  args:
+    chdir: "{{ epics_dir }}/modules/areadetector/ADAndor"

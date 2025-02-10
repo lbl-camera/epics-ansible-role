@@ -1,0 +1,37 @@
+- name: Ensure iocstats module directory exists
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/iocstats"
+    state: directory
+    mode: '0755'
+
+- name: Check if iocstats repository is already cloned
+  ansible.builtin.stat:
+    path: "{{ epics_dir }}/modules/iocstats/.git"
+  register: iocstats_repo_exists
+
+- name: Clone iocstats repository {{ iocstats_version }}
+  ansible.builtin.git:
+    repo: "https://github.com/epics-modules/iocstats.git"
+    dest: "{{ epics_dir }}/modules/iocstats"
+    version: "{{ iocstats_version }}"
+  when: not iocstats_repo_exists.stat.exists
+
+- name: Ensure configure directory exists in iocstats
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/iocstats/configure"
+    state: directory
+    mode: '0755'
+
+- name: Set EPICS_BASE in iocstats configure/RELEASE file
+  ansible.builtin.lineinfile:
+    path: "{{ epics_dir }}/modules/iocstats/configure/RELEASE"
+    line: |
+      EPICS_BASE={{ epics_dir }}/base
+      SUPPORT={{ epics_dir }}/modules
+    create: yes
+
+- name: Compile iocstats module {{ iocstats_version }}
+  ansible.builtin.shell: |
+    make
+  args:
+    chdir: "{{ epics_dir }}/modules/iocstats"

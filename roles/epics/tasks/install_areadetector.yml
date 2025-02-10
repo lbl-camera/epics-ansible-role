@@ -1,0 +1,99 @@
+- name: Ensure areadetector module directory exists
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/areadetector"
+    state: directory
+    mode: '0755'
+
+- name: Check if areadetector repository is already cloned
+  ansible.builtin.stat:
+    path: "{{ epics_dir }}/modules/areadetector/.git"
+  register: areadetector_repo_exists
+
+- name: Clone areadetector repository {{ areadetector_version }}
+  ansible.builtin.git:
+    repo: "https://github.com/areaDetector/areaDetector"
+    dest: "{{ epics_dir }}/modules/areadetector"
+    version: "{{ areadetector_version }}"
+  when: not areadetector_repo_exists.stat.exists
+
+- name: Ensure configure directory exists in areadetector
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/areadetector/configure"
+    state: directory
+    mode: '0755'
+
+- name: Create RELEASE.local
+  copy:
+    dest: "{{ epics_dir }}/modules/areadetector/configure/RELEASE.local"
+    content: |
+      ADANDOR=$(AREA_DETECTOR)/ADAndor
+
+- name: Copy RELEASE_LIBS.local
+  ansible.builtin.copy:
+    src: "{{ epics_dir }}/modules/areadetector/configure/EXAMPLE_RELEASE_LIBS.local"
+    dest: "{{ epics_dir }}/modules/areadetector/configure/RELEASE_LIBS.local"
+  
+- name: Copy RELEASE_PRODS.local
+  ansible.builtin.copy:
+    src: "{{ epics_dir }}/modules/areadetector/configure/EXAMPLE_RELEASE_PRODS.local"
+    dest: "{{ epics_dir }}/modules/areadetector/configure/RELEASE_PRODS.local"
+
+- name: Copy CONFIG_SITE.local
+  ansible.builtin.copy:
+    src: "{{ epics_dir }}/modules/areadetector/configure/EXAMPLE_CONFIG_SITE.local.{{ epics_host_arch }}"
+    dest: "{{ epics_dir }}/modules/areadetector/configure/CONFIG_SITE.local"
+
+- name: Set VARS in areadetector configure/RELEASE_LIBS.local file
+  ansible.builtin.lineinfile:
+    path: "{{ epics_dir }}/modules/areadetector/configure/RELEASE_LIBS.local"
+    line: |
+      EPICS_BASE={{ epics_dir }}/base
+      SUPPORT={{ epics_dir }}/modules
+      AREA_DETECTOR=$(SUPPORT)/areadetector
+      ASYN=$(SUPPORT)/asyn
+    create: yes
+
+- name: Set VARS in areadetector configure/RELEASE_PRODS.local file
+  ansible.builtin.lineinfile:
+    path: "{{ epics_dir }}/modules/areadetector/configure/RELEASE_PRODS.local"
+    line: |
+      EPICS_BASE={{ epics_dir }}/base
+      SUPPORT={{ epics_dir }}/modules
+      AREA_DETECTOR=$(SUPPORT)/areadetector
+      ASYN=$(SUPPORT)/asyn
+      AUTOSAVE=$(SUPPORT)/autosave
+      BUSY=$(SUPPORT)/busy
+      CALC=$(SUPPORT)/calc
+      DEVIOCSTATS=$(SUPPORT)/iocstats
+      SSCAN=$(SUPPORT)/sscan
+      SNCSEQ=$(SUPPORT)/seq
+    create: yes
+
+- name: Set VARS in areadetector configure/CONFIG_SITE.local file
+  ansible.builtin.lineinfile:
+    path: "{{ epics_dir }}/modules/areadetector/configure/CONFIG_SITE.local"
+    line: |
+      XML2_EXTERNAL=YES
+      XML2_LIB=/usr/lib64
+      XML2_INCLUDE=/usr/include/libxml2
+    create: yes
+
+- name: Set BUILD_IOCS in areadetector configure/CONFIG_SITE.local file
+  ansible.builtin.lineinfile:
+    path: "{{ epics_dir }}/modules/areadetector/configure/CONFIG_SITE.local"
+    line: |
+      BUILD_IOCS=YES
+    create: yes
+  when: build_iocs
+
+- name: Compile areadetector module {{ areadetector_version }}
+  ansible.builtin.shell: |
+    make
+  args:
+    chdir: "{{ epics_dir }}/modules/areadetector"
+
+- name: Install ADAndor
+  ansible.builtin.include_tasks: install_ad_andor.yml
+  when: install_ad_andor
+
+  

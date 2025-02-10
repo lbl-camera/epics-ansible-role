@@ -1,0 +1,43 @@
+- name: Ensure sscan module directory exists
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/sscan"
+    state: directory
+    mode: '0755'
+
+- name: Check if sscan repository is already cloned
+  ansible.builtin.stat:
+    path: "{{ epics_dir }}/modules/sscan/.git"
+  register: sscan_repo_exists
+
+- name: Clone sscan repository {{ sscan_version }}
+  ansible.builtin.git:
+    repo: "https://github.com/epics-modules/sscan.git"
+    dest: "{{ epics_dir }}/modules/sscan"
+    version: "{{ sscan_version }}"
+  when: not sscan_repo_exists.stat.exists
+
+- name: Ensure configure directory exists in sscan
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/sscan/configure"
+    state: directory
+    mode: '0755'
+
+- name: Set EPICS_BASE in sscan configure/RELEASE file
+  ansible.builtin.lineinfile:
+    path: "{{ epics_dir }}/modules/sscan/configure/RELEASE"
+    line: |
+      EPICS_BASE={{ epics_dir }}/base
+      SUPPORT={{ epics_dir }}/modules
+    create: yes
+
+- name: Comment out SNCSEQ line in the file
+  ansible.builtin.replace:
+    path: "{{ epics_dir }}/modules/sscan/configure/RELEASE"
+    regexp: '^(SNCSEQ=\$\(SUPPORT\)/seq)'
+    replace: '#\1'
+
+- name: Compile sscan module {{ sscan_version }}
+  ansible.builtin.shell: |
+    make
+  args:
+    chdir: "{{ epics_dir }}/modules/sscan"

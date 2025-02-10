@@ -1,41 +1,41 @@
 - name: Ensure mrfioc2 module directory exists
   ansible.builtin.file:
-    path: "{{ epics_base_dir }}/../modules/mrfioc2"
+    path: "{{ epics_dir }}/modules/mrfioc2"
     state: directory
     mode: '0755'
 
 - name: Check if mrfioc2 repository is already cloned
   ansible.builtin.stat:
-    path: "{{ epics_base_dir }}/../modules/mrfioc2/.git"
+    path: "{{ epics_dir }}/modules/mrfioc2/.git"
   register: mrfioc_repo_exists
 
 - name: Clone mrfioc2 repository {{ mrfioc_version }}
   ansible.builtin.git:
   #  repo: "https://github.com/epics-modules/mrfioc2.git"
     repo: "https://github.com/amichelotti/mrfioc2.git"
-    dest: "{{ epics_base_dir }}/../modules/mrfioc2"
+    dest: "{{ epics_dir }}/modules/mrfioc2"
     version: "{{ mrfioc_version }}"
   when: not mrfioc_repo_exists.stat.exists
 
 - name: Ensure configure directory exists in mrfioc2
   ansible.builtin.file:
-    path: "{{ epics_base_dir }}/../modules/mrfioc2/configure"
+    path: "{{ epics_dir }}/modules/mrfioc2/configure"
     state: directory
     mode: '0755'
 
 - name: Set EPICS_BASE in mrfioc2 configure/RELEASE file
   ansible.builtin.lineinfile:
-    path: "{{ epics_base_dir }}/../modules/mrfioc2/configure/RELEASE"
+    path: "{{ epics_dir }}/modules/mrfioc2/configure/RELEASE"
     line: |
-      EPICS_BASE={{ epics_base_dir }}
-      DEVLIB2={{ epics_base_dir }}/../modules/devlib2
+      EPICS_BASE={{ epics_dir }}/base
+      DEVLIB2={{ epics_dir }}/modules/devlib2
     create: yes
 
 - name: Compile mrfioc2 module {{ mrfioc_version }}
   ansible.builtin.shell: |
     make
   args:
-    chdir: "{{ epics_base_dir }}/../modules/mrfioc2"
+    chdir: "{{ epics_dir }}/modules/mrfioc2"
 
 
 - name: Install kernel headers for Debian-based systems
@@ -57,4 +57,4 @@
     make modules_install
     modprobe mrf
   args:
-    chdir: "{{ epics_base_dir }}/../modules/mrfioc2/mrmShared/linux"
+    chdir: "{{ epics_dir }}/modules/mrfioc2/mrmShared/linux"

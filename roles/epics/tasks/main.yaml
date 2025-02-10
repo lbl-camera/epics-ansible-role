@@ -1,13 +1,13 @@
 ---
 - name: Ensure EPICS base directory exists
   ansible.builtin.file:
-    path: "{{ epics_base_dir }}"
+    path: "{{ epics_dir }}/base"
     state: directory
     mode: '0755'
 
 - name: Check if EPICS Base repository is already cloned
   ansible.builtin.stat:
-    path: "{{ epics_base_dir }}/.git"
+    path: "{{ epics_dir }}/base/.git"
   register: epics_repo_exists
 
 - name: Install required packages on Debian-based systems
@@ -40,27 +40,27 @@
 - name: Clone EPICS Base repository varsion {{ epics_version }}
   ansible.builtin.git:
     repo: "https://github.com/epics-base/epics-base.git"
-    dest: "{{ epics_base_dir }}"
+    dest: "{{ epics_dir }}/base"
     version: "{{ epics_version }}"
   when: not epics_repo_exists.stat.exists
 
 - name: Check if EPICS Base bin directory exists
   ansible.builtin.stat:
-    path: "{{ epics_base_dir }}/bin"
+    path: "{{ epics_dir }}/base/bin"
   register: epics_bin_exists
 
 - name: Compile EPICS Base
   ansible.builtin.shell: |
     make
   args:
-    chdir: "{{ epics_base_dir }}"
+    chdir: "{{ epics_dir }}/base"
   when: not epics_bin_exists.stat.exists
 
 - name: Detect EPICS_HOST_ARCH
-  ansible.builtin.command: "{{ epics_base_dir }}/startup/EpicsHostArch"
+  ansible.builtin.command: "{{ epics_dir }}/base/startup/EpicsHostArch"
   register: epics_host_arch_result
   environment:
-    EPICS_BASE: "{{ epics_base_dir }}"
+    EPICS_BASE: "{{ epics_dir }}/base"
   changed_when: false
 
 - name: Set EPICS_HOST_ARCH variable
@@ -95,6 +95,30 @@
   ansible.builtin.include_tasks: install_asyn.yml
   when: install_asyn
 
+- name: Install autosave module
+  ansible.builtin.include_tasks: install_autosave.yml
+  when: install_autosave
+
+- name: Install busy module
+  ansible.builtin.include_tasks: install_busy.yml
+  when: install_busy
+
+- name: Install sscan module
+  ansible.builtin.include_tasks: install_sscan.yml
+  when: install_sscan
+
+- name: Install calc module
+  ansible.builtin.include_tasks: install_calc.yml
+  when: install_calc
+
+- name: Install iocstats module
+  ansible.builtin.include_tasks: install_iocstats.yml
+  when: install_iocstats
+
+- name: Install seq module
+  ansible.builtin.include_tasks: install_seq.yml
+  when: install_seq
+
 - name: Install modbus module
   ansible.builtin.include_tasks: install_modbus.yml
   when: install_modbus
@@ -106,3 +130,7 @@
 - name: Install motor module
   ansible.builtin.include_tasks: install_motor.yml
   when: install_motor
+
+- name: Install areadetector 
+  ansible.builtin.include_tasks: install_areadetector.yml
+  when: install_areadetector

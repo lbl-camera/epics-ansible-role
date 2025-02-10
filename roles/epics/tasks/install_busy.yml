@@ -1,0 +1,40 @@
+- name: Ensure busy module directory exists
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/busy"
+    state: directory
+    mode: '0755'
+
+- name: Check if busy repository is already cloned
+  ansible.builtin.stat:
+    path: "{{ epics_dir }}/modules/busy/.git"
+  register: busy_repo_exists
+
+- name: Clone busy repository {{ busy_version }}
+  ansible.builtin.git:
+    repo: "https://github.com/epics-modules/busy.git"
+    dest: "{{ epics_dir }}/modules/busy"
+    version: "{{ busy_version }}"
+  when: not busy_repo_exists.stat.exists
+
+- name: Ensure configure directory exists in busy
+  ansible.builtin.file:
+    path: "{{ epics_dir }}/modules/busy/configure"
+    state: directory
+    mode: '0755'
+
+- name: Set EPICS_BASE in busy configure/RELEASE file
+  ansible.builtin.lineinfile:
+    path: "{{ epics_dir }}/modules/busy/configure/RELEASE"
+    line: |
+      EPICS_BASE={{ epics_dir }}/base
+      SUPPORT={{ epics_dir }}/modules
+      ASYN={{ epics_dir }}/modules/asyn
+      AUTOSAVE={{ epics_dir }}/modules/autosave
+      BUSY=$(SUPPORT)/busy
+    create: yes
+
+- name: Compile busy module {{ busy_version }}
+  ansible.builtin.shell: |
+    make
+  args:
+    chdir: "{{ epics_dir }}/modules/busy"
