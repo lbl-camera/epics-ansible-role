@@ -74,11 +74,11 @@
 - name: Copy environment variables template
   ansible.builtin.template:
     src: epics_env.j2
-    dest: /etc/profile.d/epics.sh
+    dest: "{{ env_location }}/epics_env.sh"
     mode: '0644'
 
 - name: Source EPICS environment
-  ansible.builtin.shell: source /etc/profile.d/epics.sh
+  ansible.builtin.shell: "source {{ env_location }}/epics_env.sh"
 
 # Add modules below
 
