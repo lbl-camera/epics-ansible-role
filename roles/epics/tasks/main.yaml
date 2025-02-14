@@ -79,6 +79,8 @@
 
 - name: Source EPICS environment
   ansible.builtin.shell: "source {{ env_location }}/epics_env.sh"
+  args:
+    executable: /bin/bash
 
 # Add modules below
 

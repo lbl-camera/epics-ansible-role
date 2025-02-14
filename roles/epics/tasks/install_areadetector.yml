@@ -77,6 +77,15 @@
       XML2_LIB=/usr/lib64
       XML2_INCLUDE=/usr/include/libxml2
     create: yes
+  when: use_xml2
+
+- Set libhdf5 install dir
+  ansible.builtin.lineinfile:
+    path: "{{ epics_dir }}/modules/areadetector/configure/CONFIG_SITE.local"
+    line: |
+      HDF5={{ hdf5_dir }}
+      HDF5_LIB={{ hdf5_lib_dir }}
+      HDF5_INCLUDE={{ hdf5_include_dir }}
 
 - name: Set BUILD_IOCS in areadetector configure/CONFIG_SITE.local file
   ansible.builtin.lineinfile:

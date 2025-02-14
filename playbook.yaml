@@ -5,6 +5,11 @@
       vars:
       epics_dir: "/epics"
       epics_version: "R7.0.8.1"
+      use_tirpc: yes
+      use_xml2: yes
+      hdf5_dir: /usr/local64
+      hdf5_lib_dir: $(HDF5)/lib
+      hdf5_include_dir: $(HDF5)/include
       install_asyn: yes
       install_modbus: no
       install_streamdevice: no

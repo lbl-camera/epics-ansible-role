@@ -36,6 +36,7 @@
     line: |
       TIRPC=YES
     create:  yes
+  when: use_tirpc
 
 - name: Compile asyn module {{ asyn_version }}
   ansible.builtin.shell: |
