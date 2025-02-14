@@ -79,7 +79,7 @@
     create: yes
   when: use_xml2
 
-- Set libhdf5 install dir
+- name: Set libhdf5 install dir
   ansible.builtin.lineinfile:
     path: "{{ epics_dir }}/modules/areadetector/configure/CONFIG_SITE.local"
     line: |
@@ -93,7 +93,6 @@
     line: |
       BUILD_IOCS=YES
     create: yes
-  when: build_iocs
 
 - name: Compile areadetector module {{ areadetector_version }}
   ansible.builtin.shell: |
@@ -101,8 +100,7 @@
   args:
     chdir: "{{ epics_dir }}/modules/areadetector"
 
-- name: Install ADAndor
-  ansible.builtin.include_tasks: install_ad_andor.yml
-  when: install_ad_andor
-
+- name: Install Areadetector IOCs
+  ansible.builtin.include_tasks: "install_{{ item.key }}.yml"
+  loop: "{{ areadetector_iocs | dict2items}}"
   

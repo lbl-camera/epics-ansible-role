@@ -3,25 +3,8 @@
   roles:
     - role: epics
       vars:
-      epics_dir: "/epics"
-      epics_version: "R7.0.8.1"
-      use_tirpc: yes
-      use_xml2: yes
-      hdf5_dir: /usr/local64
-      hdf5_lib_dir: $(HDF5)/lib
-      hdf5_include_dir: $(HDF5)/include
-      install_asyn: yes
-      install_modbus: no
-      install_streamdevice: no
-      install_motor: no
-      install_autosave: yes
-      install_calc: yes
-      install_busy: yes
-      install_sscan: yes
-      install_iocstats: yes
-      install_seq: yes
-      build_iocs: yes
-      install_areadetector: yes
-      install_ad_andor: yes
-      ad_andor_version: master
-      areadetector_version: "R3-14"
+      epics_dir: "/home/rp/Software/ansible/epics-ansible-role/build"
+      areadetector_iocs:
+        ADAndor: master
+      ansible_os_family: blah
+      env_location: .

@@ -9,11 +9,11 @@
     path: "{{ epics_dir }}/modules/devlib2/.git"
   register: devlib2_repo_exists
 
-- name: Clone devLib2 repository {{ devlib2_version }}
+- name: Clone devLib2 repository {{ install_modules['devlib2'] }}
   ansible.builtin.git:
     repo: "https://github.com/epics-modules/devlib2.git"
     dest: "{{ epics_dir }}/modules/devlib2"
-    version: "{{ devlib2_version }}"
+    version: "{{ install_modules['devlib2'] }}"
   when: not devlib2_repo_exists.stat.exists
 
 - name: Ensure configure directory exists in devLib2
@@ -28,7 +28,7 @@
     line: "EPICS_BASE={{ epics_dir }}/base"
     create: yes
 
-- name: Compile devLib2 module {{ devlib2_version }}
+- name: Compile devLib2 module {{ install_modules['devlib2'] }}
   ansible.builtin.shell: |
     make
   args:

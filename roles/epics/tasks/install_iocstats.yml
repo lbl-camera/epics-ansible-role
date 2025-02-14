@@ -9,11 +9,11 @@
     path: "{{ epics_dir }}/modules/iocstats/.git"
   register: iocstats_repo_exists
 
-- name: Clone iocstats repository {{ iocstats_version }}
+- name: Clone iocstats repository {{ install_modules['iocstats'] }}
   ansible.builtin.git:
     repo: "https://github.com/epics-modules/iocstats.git"
     dest: "{{ epics_dir }}/modules/iocstats"
-    version: "{{ iocstats_version }}"
+    version: "{{ install_modules['iocstats'] }}"
   when: not iocstats_repo_exists.stat.exists
 
 - name: Ensure configure directory exists in iocstats
@@ -30,7 +30,7 @@
       SUPPORT={{ epics_dir }}/modules
     create: yes
 
-- name: Compile iocstats module {{ iocstats_version }}
+- name: Compile iocstats module {{ install_modules['iocstats'] }}
   ansible.builtin.shell: |
     make
   args:

@@ -9,11 +9,11 @@
     path: "{{ epics_dir }}/modules/asyn/.git"
   register: asyn_repo_exists
 
-- name: Clone asyn repository {{ asyn_version }}
+- name: Clone asyn repository {{ install_modules['asyn'] }}
   ansible.builtin.git:
     repo: "https://github.com/epics-modules/asyn.git"
     dest: "{{ epics_dir }}/modules/asyn"
-    version: "{{ asyn_version }}"
+    version: "{{ install_modules['asyn'] }}"
   when: not asyn_repo_exists.stat.exists
 
 - name: Ensure configure directory exists in asyn
@@ -38,7 +38,7 @@
     create:  yes
   when: use_tirpc
 
-- name: Compile asyn module {{ asyn_version }}
+- name: Compile asyn module {{ install_modules['asyn'] }}
   ansible.builtin.shell: |
     make
   args:

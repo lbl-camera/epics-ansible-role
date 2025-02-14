@@ -9,11 +9,11 @@
     path: "{{ epics_dir }}/modules/autosave/.git"
   register: autosave_repo_exists
 
-- name: Clone autosave repository {{ autosave_version }}
+- name: Clone autosave repository {{ install_modules['autosave'] }}
   ansible.builtin.git:
     repo: "https://github.com/epics-modules/autosave.git"
     dest: "{{ epics_dir }}/modules/autosave"
-    version: "{{ autosave_version }}"
+    version: "{{ install_modules['autosave'] }}"
   when: not autosave_repo_exists.stat.exists
 
 - name: Ensure configure directory exists in autosave
@@ -30,7 +30,7 @@
       SUPPORT={{ epics_dir }}/modules
     create: yes
 
-- name: Compile autosave module {{ autosave_version }}
+- name: Compile autosave module {{ install_modules['autosave'] }}
   ansible.builtin.shell: |
     make
   args:

@@ -1,26 +1,19 @@
-## Andrea Michelotti
-## andrea.michelotti@infn.it
-
 epics_base_dir: "/opt/epics/base"
 epics_version: "R7.0.8.1"
-devlib2_version: "2.12"
-asyn_version: "R4-44"
-autosave_version: "R5-11"
-busy_version: "R1-7-3"
-streamdevice_version: "2.8.24"
-sscan_version: "R2-11-6"
-calc_version: "R3-7-5"
-motor_version: "R7-3"
-iocstats_version: "3.2.0"
-seq_version: "R2-2-9"
-mrfioc_version: master # update driver
+use_tirpc: yes
+use_xml2: yes
+hdf5_dir: /usr/local64
+hdf5_lib_dir: $(HDF5)/lib
+hdf5_include_dir: $(HDF5)/include
+install_modules: # TODO: enforce this order
+  asyn: "R4-44"
+  autosave: "R5-11"
+  busy: "R1-7-3"
+  sscan: "R2-11-6"
+  calc: "R3-7-5"
+  iocstats: "3.2.0"
+  seq: "R2-2-9"
+areadetector_version: "R3-14"
+areadetector_iocs: {}
 env_location: /etc/profile.d
 
-# EPICS module installation toggles
-install_mrf: false
-install_devlib: false
-
-install_asyn: false
-install_modbus: false
-install_streamdevice: false
-install_motor: false

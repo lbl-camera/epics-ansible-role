@@ -9,11 +9,11 @@
     path: "{{ epics_dir }}/modules/busy/.git"
   register: busy_repo_exists
 
-- name: Clone busy repository {{ busy_version }}
+- name: Clone busy repository {{ install_modules['busy'] }}
   ansible.builtin.git:
     repo: "https://github.com/epics-modules/busy.git"
     dest: "{{ epics_dir }}/modules/busy"
-    version: "{{ busy_version }}"
+    version: "{{ install_modules['busy'] }}"
   when: not busy_repo_exists.stat.exists
 
 - name: Ensure configure directory exists in busy
@@ -33,8 +33,9 @@
       BUSY=$(SUPPORT)/busy
     create: yes
 
-- name: Compile busy module {{ busy_version }}
+- name: Compile busy module {{ install_modules['busy'] }}
   ansible.builtin.shell: |
     make
   args:
     chdir: "{{ epics_dir }}/modules/busy"
+

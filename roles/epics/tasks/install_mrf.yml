@@ -9,12 +9,12 @@
     path: "{{ epics_dir }}/modules/mrfioc2/.git"
   register: mrfioc_repo_exists
 
-- name: Clone mrfioc2 repository {{ mrfioc_version }}
+- name: Clone mrfioc2 repository {{ install_modules['mrfioc'] }}
   ansible.builtin.git:
   #  repo: "https://github.com/epics-modules/mrfioc2.git"
     repo: "https://github.com/amichelotti/mrfioc2.git"
     dest: "{{ epics_dir }}/modules/mrfioc2"
-    version: "{{ mrfioc_version }}"
+    version: "{{ install_modules['mrfioc'] }}"
   when: not mrfioc_repo_exists.stat.exists
 
 - name: Ensure configure directory exists in mrfioc2
@@ -31,7 +31,7 @@
       DEVLIB2={{ epics_dir }}/modules/devlib2
     create: yes
 
-- name: Compile mrfioc2 module {{ mrfioc_version }}
+- name: Compile mrfioc2 module {{ install_modules['mrfioc'] }}
   ansible.builtin.shell: |
     make
   args:
@@ -51,7 +51,7 @@
   when: ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Fedora"
 
 
-- name: Compile mrfioc2 kernel module {{ mrfioc_version }}
+- name: Compile mrfioc2 kernel module {{ install_modules['mrfioc'] }}
   ansible.builtin.shell: |
     make
     make modules_install

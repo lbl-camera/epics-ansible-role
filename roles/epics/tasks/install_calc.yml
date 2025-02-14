@@ -9,11 +9,11 @@
     path: "{{ epics_dir }}/modules/calc/.git"
   register: calc_repo_exists
 
-- name: Clone calc repository {{ calc_version }}
+- name: Clone calc repository {{ install_modules['calc'] }}
   ansible.builtin.git:
     repo: "https://github.com/epics-modules/calc.git"
     dest: "{{ epics_dir }}/modules/calc"
-    version: "{{ calc_version }}"
+    version: "{{ install_modules['calc'] }}"
   when: not calc_repo_exists.stat.exists
 
 - name: Ensure configure directory exists in calc
@@ -31,7 +31,7 @@
       SSCAN=$(SUPPORT)/sscan
     create: yes
 
-- name: Compile calc module {{ calc_version }}
+- name: Compile calc module {{ install_modules['calc'] }}
   ansible.builtin.shell: |
     make
   args:

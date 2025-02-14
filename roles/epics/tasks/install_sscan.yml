@@ -9,11 +9,11 @@
     path: "{{ epics_dir }}/modules/sscan/.git"
   register: sscan_repo_exists
 
-- name: Clone sscan repository {{ sscan_version }}
+- name: Clone sscan repository {{ install_modules['sscan'] }}
   ansible.builtin.git:
     repo: "https://github.com/epics-modules/sscan.git"
     dest: "{{ epics_dir }}/modules/sscan"
-    version: "{{ sscan_version }}"
+    version: "{{ install_modules['sscan'] }}"
   when: not sscan_repo_exists.stat.exists
 
 - name: Ensure configure directory exists in sscan
@@ -36,7 +36,7 @@
     regexp: '^(SNCSEQ=\$\(SUPPORT\)/seq)'
     replace: '#\1'
 
-- name: Compile sscan module {{ sscan_version }}
+- name: Compile sscan module {{ install_modules['sscan'] }}
   ansible.builtin.shell: |
     make
   args:

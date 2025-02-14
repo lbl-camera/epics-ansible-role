@@ -9,11 +9,11 @@
     path: "{{ epics_dir }}/modules/seq/.git"
   register: seq_repo_exists
 
-- name: Clone seq repository {{ seq_version }}
+- name: Clone seq repository {{ install_modules['seq'] }}
   ansible.builtin.git:
     repo: "https://github.com/epics-modules/sequencer.git"
     dest: "{{ epics_dir }}/modules/seq"
-    version: "{{ seq_version }}"
+    version: "{{ install_modules['seq'] }}"
   when: not seq_repo_exists.stat.exists
 
 - name: Ensure configure directory exists in seq
@@ -29,7 +29,7 @@
       EPICS_BASE={{ epics_dir }}/base
     create: yes
 
-- name: Compile seq module {{ seq_version }}
+- name: Compile seq module {{ install_modules['seq'] }}
   ansible.builtin.shell: |
     make
   args:

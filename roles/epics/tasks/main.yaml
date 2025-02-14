@@ -21,6 +21,7 @@
       - libc-dev-bin # asyn
       - libntirpc-dev  # async rpc.h
     state: present
+  become: true
   when: ansible_os_family == "Debian"
 
 - name: Install required packages on Red Hat-based systems
@@ -35,6 +36,7 @@
       - rpcgen # for asyn
 #      - libtirpc-devel # for asyn rpc.h
     state: present
+  become: true
   when: ansible_os_family == "RedHat"
 
 - name: Clone EPICS Base repository varsion {{ epics_version }}
@@ -83,56 +85,10 @@
     executable: /bin/bash
 
 # Add modules below
-
-- name: Install devLib2 module
-  ansible.builtin.include_tasks: install_devlib2.yml
-  when: install_devlib or install_mrf
-
-
-- name: Install mrf module
-  ansible.builtin.include_tasks: install_mrf.yml
-  when: install_devlib or install_mrf
-
-- name: Install asyn module
-  ansible.builtin.include_tasks: install_asyn.yml
-  when: install_asyn
-
-- name: Install autosave module
-  ansible.builtin.include_tasks: install_autosave.yml
-  when: install_autosave
-
-- name: Install busy module
-  ansible.builtin.include_tasks: install_busy.yml
-  when: install_busy
-
-- name: Install sscan module
-  ansible.builtin.include_tasks: install_sscan.yml
-  when: install_sscan
-
-- name: Install calc module
-  ansible.builtin.include_tasks: install_calc.yml
-  when: install_calc
-
-- name: Install iocstats module
-  ansible.builtin.include_tasks: install_iocstats.yml
-  when: install_iocstats
-
-- name: Install seq module
-  ansible.builtin.include_tasks: install_seq.yml
-  when: install_seq
-
-- name: Install modbus module
-  ansible.builtin.include_tasks: install_modbus.yml
-  when: install_modbus
-
-- name: Install streamdevice module
-  ansible.builtin.include_tasks: install_streamdevice.yml
-  when: install_streamdevice
-
-- name: Install motor module
-  ansible.builtin.include_tasks: install_motor.yml
-  when: install_motor
+- name: Install modules
+  ansible.builtin.include_tasks: "install_{{ item.key }}.yml"
+  loop: "{{ install_modules | dict2items}}"
 
 - name: Install areadetector 
   ansible.builtin.include_tasks: install_areadetector.yml
-  when: install_areadetector
+  when: areadetector_version
