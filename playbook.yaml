@@ -3,8 +3,5 @@
   roles:
     - role: epics
       vars:
-      epics_dir: "/home/rp/Software/ansible/epics-ansible-role/build"
       areadetector_iocs:
         ADAndor: master
-      ansible_os_family: blah
-      env_location: .
