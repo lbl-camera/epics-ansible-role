@@ -1,10 +1,7 @@
-epics_base_dir: "/opt/epics/base"
+epics_dir: "/epics"
 epics_version: "R7.0.8.1"
 use_tirpc: yes
 use_xml2: yes
-hdf5_dir: /usr/local64
-hdf5_lib_dir: $(HDF5)/lib
-hdf5_include_dir: $(HDF5)/include
 install_modules: # TODO: enforce this order
   asyn: "R4-44"
   autosave: "R5-11"
