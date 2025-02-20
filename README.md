@@ -23,6 +23,13 @@ This example playbook will the ADAndor IOC and all epics components required to 
         ADAndor: master
 ```
 
+An example `inventory.ini` and `playbook.yaml` are included. Note that the default install path is `/epics`, therefore 
+the install must be run with escalated privileges (or the install dir modified). 
+
+```bash
+$ ansible-playbook -i inventory.ini playbook.yaml
+````
+
 ## Role Variables
 
 ### Location Variables
