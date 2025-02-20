@@ -1,59 +1,80 @@
 # Ansible Role: EPICS
 
-This Ansible role installs the **EPICS Base** and selected EPICS modules, such as **asyn**, **modbus**, **streamdevice**, **motor**, **devLib2**, **autosave**, **calc**, and **busy**, on **Debian** and **RedHat/CentOS**-based systems.
+This Ansible role installs the **EPICS Base**, selected EPICS **support** modules, **areadetector**, and areadetector **iocs** on **Debian** and **RedHat/CentOS**-based systems.
 
 ## Requirements
 
 - Ansible 2.9+
 - Git
-- Required development tools and libraries (installed by the role)
 
 ## Role Variables
 
-### Required Variables
+### Location Variables
 These variables should be defined in your playbook or inventory:
 
-| Variable            | Description                                                   | Default          |
-|---------------------|---------------------------------------------------------------|------------------|
-| `epics_base_dir`    | Directory to install EPICS Base                               | `/opt/epics/base` |
-| `epics_version`     | EPICS Base version to install                                 | `7.0.5`           |
-| `epics_modules_dir` | Directory to install EPICS modules                            | `/opt/epics/modules` |
-| `epics_host_arch`   | Target architecture for EPICS (e.g., `linux-x86_64`)          | Auto-detected    |
+| Variable          | Description                                          | Default       |
+|-------------------|------------------------------------------------------|---------------|
+| `epics_dir`       | Directory to install EPICS                           | `/epics`      |
+| `epics_version`   | EPICS Base version to install                        | `R7.0.8.1`    |
+| `epics_host_arch` | Target architecture for EPICS (e.g., `linux-x86_64`) | Auto-detected |
 
-### Optional Module Variables
-These modules can be included and configured as needed. Set the relevant variable to `yes` to enable installation.
+### Support Modules
 
-| Variable                  | Description                            | Default   |
-|---------------------------|----------------------------------------|-----------|
-| `install_asyn`            | Install asyn module                   | `no`      |
-| `install_modbus`          | Install modbus module                 | `no`      |
-| `install_streamdevice`    | Install streamdevice module           | `no`      |
-| `install_motor`           | Install motor module                  | `no`      |
-| `install_devlib2`         | Install devLib2 module                | `yes`     |
-| `install_autosave`        | Install autosave module               | `no`      |
-| `install_calc`            | Install calc module                   | `no`      |
-| `install_busy`            | Install busy module                   | `no`      |
+Support modules required for areadetector will be installed by default. You change the selection of which support 
+modules to install, and their versions, by setting install_modules, for example:
 
-Each module's version can be specified using `module_name_version` (e.g., `asyn_version`).
+```yaml
+install_modules:
+  asyn: "R4-44"
+```
 
-## Dependencies
+Support modules are installed in the order specified. This is important, as there are cross-dependencies. See the
+defaults in `defaults/main.yml` for a typical install sequence.
 
-None.
+### Dependency Variables
+
+| Variable    | Description                                                                            | Default |
+|-------------|----------------------------------------------------------------------------------------|---------|
+| `use_tirpc` | Uses libtirpc as a provider of RPC related symbols (recommended on newer environments) | `yes`   |
+| `use_xml2`  | Uses libxml2 as a provider of xml related symbols (recommended on newer environments)  | `yes`   |
+
+### IOC Variables
+
+By default, no areadetector IOCs will be installed. You must specify desired iocs (and versions) in the 
+`areadetector_iocs` variable.
+
+```yaml
+areadetector_iocs:
+  ADAndor: master
+```
+
 
 ## Example Playbook
 
+This playbook will install all epics components required to support the ADAndor IOC.
+
 ```yaml
-- hosts: all
+- name: epics
+  hosts: all
   roles:
     - role: epics
       vars:
-        epics_base_dir: "/opt/epics/base"
-        epics_version: "7.0.5"
-        install_asyn: yes
-        install_modbus: yes
-        install_streamdevice: yes
-        install_motor: yes
-        install_autosave: yes
-        install_calc: yes
-        install_busy: yes
+      areadetector_iocs:
+        ADAndor: master
 ```
+
+## For Developers
+To accelerate local development of this role, you may use [act](https://github.com/nektos/act) to run the test workflow locally in an
+isolated docker container. The steps for this are:
+
+- Install Docker Desktop
+- Download [act](https://github.com/nektos/act) and extract into this project directory
+- Run `./act`
+- (First run only) Select the "Medium" image as the default
+
+Act then execute the workflow in an isolated environment, running the playbook at `.github/playbooks/test-playbook.yaml`.
+
+---
+This repo was forked from [infn-epics/epics-ansible-role](https://baltig.infn.it/infn-epics/epics-ansible-role/-/tree/main),
+which provides a role for installing epics base and certain support IOCs. This repo is an extension and refactoring of
+that to support areadetector and IOC installation.
