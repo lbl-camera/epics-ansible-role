@@ -74,7 +74,7 @@
     path: "{{ epics_dir }}/modules/areadetector/configure/CONFIG_SITE.local"
     line: |
       XML2_EXTERNAL=YES
-      XML2_LIB=/usr/lib64
+      {{ 'XML2_LIB=/usr/lib/x86_64-linux-gnu' if ansible_os_family == 'Debian' else 'XML2_LIB=/usr/lib64' }}
       XML2_INCLUDE=/usr/include/libxml2
     create: yes
   when: use_xml2
@@ -83,9 +83,8 @@
   ansible.builtin.lineinfile:
     path: "{{ epics_dir }}/modules/areadetector/configure/CONFIG_SITE.local"
     line: |
-      HDF5={{ hdf5_dir }}
-      HDF5_LIB={{ hdf5_lib_dir }}
-      HDF5_INCLUDE={{ hdf5_include_dir }}
+      HDF5_LIB={{ '/usr/lib/x86_64-linux-gnu' if ansible_os_family == 'Debian' else '/usr/lib64' }}
+      HDF5_INCLUDE={{ '/usr/include/hdf5/serial' if ansible_os_family == 'Debian' else '/usr/include' }}
 
 - name: Set BUILD_IOCS in areadetector configure/CONFIG_SITE.local file
   ansible.builtin.lineinfile:
@@ -103,4 +102,3 @@
 - name: Install Areadetector IOCs
   ansible.builtin.include_tasks: "install_{{ item.key }}.yml"
   loop: "{{ areadetector_iocs | dict2items}}"
-  
