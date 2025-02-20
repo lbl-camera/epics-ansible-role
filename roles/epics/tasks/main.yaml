@@ -17,8 +17,12 @@
       - git
       - libreadline-dev
       - libncurses5-dev
-      - libdbd-dev
+      - re2c # for seq
       - libc-dev-bin # asyn
+      - libxml2-dev # for areadetector
+      - libboost-all-dev # for areadetector
+      - libhdf5-dev # for areadetector
+#      - libdbd-dev
       - libntirpc-dev  # async rpc.h
     state: present
   become: true
@@ -32,8 +36,12 @@
       - git
       - readline-devel
       - ncurses-devel
-      - libdb-devel
       - rpcgen # for asyn
+      - libxml2-devel # for areadetector
+      - boost-devel # for areadetector
+      - hdf5-devel # for areadetector
+      - re2c # for seq
+#      - libdb-devel
 #      - libtirpc-devel # for asyn rpc.h
     state: present
   become: true
