@@ -10,6 +10,20 @@ This Ansible role installs the **EPICS Base**, selected EPICS **support** module
 - Ansible 2.9+
 - Git
 
+## Example Playbook
+
+This example playbook will the ADAndor IOC and all epics components required to support it.
+
+```yaml
+- name: epics
+  hosts: all
+  roles:
+    - role: epics
+      vars:
+      areadetector_iocs:
+        ADAndor: master
+```
+
 ## Role Variables
 
 ### Location Variables
@@ -49,21 +63,6 @@ By default, no areadetector IOCs will be installed. You must specify desired ioc
 ```yaml
 areadetector_iocs:
   ADAndor: master
-```
-
-
-## Example Playbook
-
-This playbook will install all epics components required to support the ADAndor IOC.
-
-```yaml
-- name: epics
-  hosts: all
-  roles:
-    - role: epics
-      vars:
-      areadetector_iocs:
-        ADAndor: master
 ```
 
 ## For Developers
