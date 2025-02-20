@@ -1,5 +1,8 @@
 # Ansible Role: EPICS
 
+---
+[![main](https://github.com/lbl-camera/epics-ansible-role/actions/workflows/main.yml/badge.svg)](https://github.com/lbl-camera/epics-ansible-role/actions/workflows/main.yml)
+
 This Ansible role installs the **EPICS Base**, selected EPICS **support** modules, **areadetector**, and areadetector **iocs** on **Debian** and **RedHat/CentOS**-based systems.
 
 ## Requirements
