@@ -27,3 +27,11 @@
     make
   args:
     chdir: "{{ epics_dir }}/modules/areadetector/ADAndor"
+
+- name: Test ADAndor ioc startup
+  ansible.builtin.shell: |
+    timeout 30s "echo exit | iocs/andorIOC/bin/linux-x86_64/andorCCDApp" || { echo "Test timed out"; exit 1; }
+  args:
+    chdir: "{{ epics_dir }}/modules/areadetector/ADAndor"
+  register: result
+  failed_when: result.rc != 0
