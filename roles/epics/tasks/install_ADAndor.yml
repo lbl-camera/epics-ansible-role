@@ -9,11 +9,11 @@
     path: "{{ epics_dir }}/modules/areadetector/ADAndor/.git"
   register: ad_andor_repo_exists
 
-- name: Clone andor repository {{ ad_andor_version }}
+- name: Clone andor repository {{ areadetector_iocs['ADAndor'] }}
   ansible.builtin.git:
     repo: "https://github.com/areaDetector/ADAndor"
     dest: "{{ epics_dir }}/modules/areadetector/ADAndor"
-    version: "{{ ad_andor_version }}"
+    version: "{{ areadetector_iocs['ADAndor'] }}"
   when: not ad_andor_repo_exists.stat.exists
 
 - name: Ensure configure directory exists in andor
@@ -22,7 +22,7 @@
     state: directory
     mode: '0755'
 
-- name: Compile andor module {{ ad_andor_version }}
+- name: Compile andor module {{ areadetector_iocs['ADAndor'] }}
   ansible.builtin.shell: |
     make
   args:
@@ -30,7 +30,7 @@
 
 - name: Test ADAndor ioc startup
   ansible.builtin.shell: |
-    timeout 30s "echo exit | iocs/andorIOC/bin/linux-x86_64/andorCCDApp" || { echo "Test timed out"; exit 1; }
+    timeout 30s bash -c "echo exit | iocs/andorIOC/bin/linux-x86_64/andorCCDApp"
   args:
     chdir: "{{ epics_dir }}/modules/areadetector/ADAndor"
   register: result
