@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 # pinned below 24 until act catches up so I can debug locally
     steps:
       - uses: actions/checkout@v4
 
