@@ -42,8 +42,8 @@ jobs:
             
             [local:vars]
             ansible_connection=local
-            epics_dir=~/build
-            env_location=~
+            epics_dir=/home/runner/build
+            env_location=/home/runner
           # Optional, SSH known hosts file content
 #          known_hosts: |
 #            example.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
